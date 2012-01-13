@@ -9,4 +9,4 @@
     %ul
       - for gist in gists
         %li
-          #{gist["git_pull_url"]}
+          #{gist.metadata["git_pull_url"]} - #{gist.id}
