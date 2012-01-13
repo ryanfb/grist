@@ -17,11 +17,29 @@ set :github_options, {
 Sinatra.register Sinatra::Auth::Github
 
 class Gist
-  attr_reader :metadata, :id
+  attr_reader :metadata, :id, :path
 
   def initialize(gist_hash = {})
     @metadata = gist_hash
     @id = @metadata["id"]
+    @path = File.join('gists',"#{@id}")
+    self.update
+  end
+
+  def update
+    if !File.directory?(@path)
+      self.clone
+    else
+      command = "git --git-dir=\"#{File.join(@path,'.git')}\" --work-tree=\"#{@path}\" pull"
+      puts command
+      `#{command}`
+    end
+  end
+
+  def clone
+    command = "git clone \"#{@metadata["git_push_url"]}\" \"#{@path}\""
+    puts command
+    `#{command}`
   end
 end
 
@@ -54,6 +72,7 @@ helpers do
     return gists
   end
   def gists
+    # gist_cache.each{|gist| gist.update}
     gist_cache
   end
 end
