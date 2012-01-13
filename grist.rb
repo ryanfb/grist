@@ -4,6 +4,7 @@ require 'yaml'
 require 'haml'
 require 'pp'
 require 'rest_client'
+require 'xapian-fu'
 
 enable :sessions, :logging
 
@@ -41,6 +42,10 @@ class Gist
     puts command
     `#{command}`
   end
+
+  def files
+    @metadata["files"].values.collect{|file_hash| file_hash["filename"]}
+  end
 end
 
 def fetch_all_gists
@@ -54,6 +59,21 @@ def fetch_all_gists
     gists += JSON.parse(response)
   end
   return gists.map{|gist_hash| Gist.new(gist_hash)}
+end
+
+def build_xapian_db
+  db = XapianFu::XapianDb.new(:dir => 'gists.db', :create => true,
+                              :store => [:id, :filename, :content])
+  gist_cache.each do |gist|
+    gist.files.each do |file|
+      contents = File.open(File.join(gist.path, file),"rb") {|f| f.read}
+      db << { :id => gist.id, :filename => file, :content => contents}
+    end
+  end
+  db.flush
+  db.search("leiden").each do |match|
+    puts match.values[:id]
+  end
 end
 
 helpers do
@@ -79,6 +99,7 @@ end
 
 get '/' do
   authenticate!
+  build_xapian_db
   puts "test"
   haml :index
 end

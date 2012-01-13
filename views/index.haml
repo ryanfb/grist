@@ -32,5 +32,5 @@
         - for gist in gists
           %dt
             #{gist.id}
-            - for file in gist.metadata["files"].keys
+            - for file in gist.files
               %dd= file
