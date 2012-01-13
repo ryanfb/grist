@@ -1,12 +1,36 @@
 !!!
 %html{html_attrs('en')}
   %head
-    %meta{ 'http-equiv' => 'content-type', 'content' => 'text/html;charset=UTF-8' }
+    %meta{'http-equiv' => 'content-type', 'content' => 'text/html;charset=UTF-8'}
+    %link{:rel => "stylesheet", :href => "http://twitter.github.com/bootstrap/1.4.0/bootstrap.min.css"}
     %title Grist.
-  %body
-    %p
-      Hello, #{github_user.name}. You have #{gists.length} gists.
-    %ul
-      - for gist in gists
-        %li
-          #{gist.metadata["git_pull_url"]} - #{gist.id}
+  %body{:style=>"padding-top: 40px;"}
+    .topbar
+      .topbar-inner
+        .container
+          %a.brand
+            Grist
+          .pull-right
+            %form
+              %input.span6{:type => "text", :placeholder => "Search"}
+            %ul.nav
+              %li
+                %a{:href => "/logout"}
+                  Sign out
+    .row
+      &nbsp;
+    %header
+      %center
+        .inner
+          .container
+            %h1
+              Hello, #{github_user.name}.
+              %small
+                You have #{gists.length} gists.
+    .container
+      %dl
+        - for gist in gists
+          %dt
+            #{gist.id}
+            - for file in gist.metadata["files"].keys
+              %dd= file
