@@ -98,6 +98,12 @@ class GistList
       puts match.values[:id]
     end
   end
+  
+  def update_checkouts
+    @gists.each do |gist|
+      gist.update
+    end
+  end
 
   def fetch_gist_page(gist_page)
     puts "Fetching page #{gist_page}"
@@ -140,6 +146,11 @@ get '/update' do
   GistList.instance.github_user = github_user
 
   GistList.instance.update
+  "OK!"
+end
+
+get '/update_checkouts' do
+  GistList.instance.update_checkouts
   "OK!"
 end
 
