@@ -5,6 +5,7 @@ require 'haml'
 require 'pp'
 require 'rest_client'
 require 'xapian-fu'
+require 'singleton'
 
 enable :sessions, :logging
 
@@ -24,7 +25,7 @@ class Gist
     @metadata = gist_hash
     @id = @metadata["id"]
     @path = File.join('gists',"#{@id}")
-    self.update
+    # self.update
   end
 
   def update
@@ -48,31 +49,70 @@ class Gist
   end
 end
 
-def fetch_all_gists
-  page = 1
-  response = RestClient.get("https://api.github.com/gists", :params => { :access_token => github_user.token }, :accept => :json)
-  gists = JSON.parse(response)
-  while response.headers[:link] =~ /rel..next/ do
-    page += 1
-    puts "Fetching page #{page}"
-    response = RestClient.get("https://api.github.com/gists", :params => { :access_token => github_user.token, :page => page }, :accept => :json)
-    gists += JSON.parse(response)
-  end
-  return gists.map{|gist_hash| Gist.new(gist_hash)}
-end
+class GistList
+  include Singleton
 
-def build_xapian_db
-  db = XapianFu::XapianDb.new(:dir => 'gists.db', :create => true,
-                              :store => [:id, :filename, :content])
-  gist_cache.each do |gist|
-    gist.files.each do |file|
-      contents = File.open(File.join(gist.path, file),"rb") {|f| f.read}
-      db << { :id => gist.id, :filename => file, :content => contents}
+  YAML_PATH = 'gists.yml'
+  attr_accessor :gists, :github_user
+
+  def initialize
+    if File.exists?('gists.yml')
+      puts "Loading from YAML"
+      @gists = YAML.load_file('gists.yml')
+    else
+      @gists = []
     end
   end
-  db.flush
-  db.search("leiden").each do |match|
-    puts match.values[:id]
+
+  def update
+    if @gists.length == 0
+      fetch_all_gists
+    end
+  end
+
+  def add_gists(gists)
+    @gists += gists
+    self.save
+  end
+
+  def save
+    puts "Saving YAML"
+    File.open(YAML_PATH, 'w') {|f| f.write(YAML.dump(@gists))}
+  end
+  
+  def build_xapian_db
+    db = XapianFu::XapianDb.new(:dir => 'gists.db', :create => true,
+                                :store => [:id, :filename, :content])
+    @gists.each do |gist|
+      gist.update
+      gist.files.each do |file|
+        contents = File.open(File.join(gist.path, file),"rb") {|f| f.read}
+        db << { :id => gist.id, :filename => file, :content => contents}
+      end
+    end
+    db.flush
+    db.search("leiden").each do |match|
+      puts match.values[:id]
+    end
+  end
+
+  def fetch_gist_page(gist_page)
+    puts "Fetching page #{gist_page}"
+    response = RestClient.get("https://api.github.com/gists", :params => { :access_token => github_user.token, :page => gist_page }, :accept => :json)
+    gists = JSON.parse(response)
+    GistList.instance.add_gists(gists.map{|gist_hash| Gist.new(gist_hash)})
+  end
+
+  def fetch_all_gists
+    page = 1
+    response = RestClient.get("https://api.github.com/gists", :params => { :access_token => github_user.token }, :accept => :json)
+    gists = JSON.parse(response)
+    pages = response.headers[:link].scan(/(\d+)>; rel="last"$/).first.first.to_i
+    puts "Pages: #{pages}"
+    GistList.instance.add_gists(gists.map{|gist_hash| Gist.new(gist_hash)})
+    (2..pages).each do |page|
+      fetch_gist_page(page)
+    end
   end
 end
 
@@ -80,27 +120,16 @@ helpers do
   def repos
     github_request("user/repos")
   end
-  def gist_cache
-    if File.exists?('gists.yml')
-      puts "Loading from YAML"
-      gists = YAML.load_file('gists.yml')
-    else
-      puts "Fetching gists"
-      gists = fetch_all_gists
-      File.open('gists.yml', 'w') {|f| f.write(YAML.dump(gists))}
-    end
-    return gists
-  end
   def gists
-    # gist_cache.each{|gist| gist.update}
-    gist_cache
+    GistList.instance.gists
   end
 end
 
 get '/' do
   authenticate!
-  build_xapian_db
-  puts "test"
+  GistList.instance.github_user = github_user
+  GistList.instance.update
+
   haml :index
 end
 
