@@ -16,6 +16,7 @@ document.observe("dom:loaded", function() {
           new Ajax.Request('/update_index',{method:'get',
             onSuccess: function(response) {
               $('info_text').innerHTML = 'All done. Thanks for waiting!';
+              $('searchbox').enable();
               spinner.stop();
               // $('initial_fetch').remove();
             }

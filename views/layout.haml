@@ -15,9 +15,11 @@
         .container
           %a.brand
             Grist
+          %a.btn.primary{:style => "margin:4px;"}
+            Update
           .pull-right
             %form
-              %input.span6{:type => "text", :placeholder => "Search", :disabled => "disabled"}
+              %input.span6#searchbox{:type => "text", :placeholder => "Search", :disabled => "disabled"}
             %ul.nav
               %li
                 %a{:href => "/logout"}
