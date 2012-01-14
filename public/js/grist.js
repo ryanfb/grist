@@ -1,4 +1,5 @@
 document.observe("dom:loaded", function() {
+  var spinner = new Spinner({length:30,width:20,radius:40}).spin($('info_spinner'));
   new Ajax.Request('/fetch_progress',{method:'get',
     onSuccess: function(response) {
       if(response.responseText == "0") {
