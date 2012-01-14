@@ -87,7 +87,6 @@ class GistList
     db = XapianFu::XapianDb.new(:dir => 'gists.db', :create => true,
                                 :store => [:id, :filename, :content])
     @gists.each do |gist|
-      gist.update
       gist.files.each do |file|
         contents = File.open(File.join(gist.path, file),"rb") {|f| f.read}
         db << { :id => gist.id, :filename => file, :content => contents}
@@ -151,6 +150,11 @@ end
 
 get '/update_checkouts' do
   GistList.instance.update_checkouts
+  "OK!"
+end
+
+get '/update_index' do
+  GistList.instance.build_xapian_db
   "OK!"
 end
 

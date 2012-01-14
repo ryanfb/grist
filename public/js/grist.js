@@ -13,7 +13,13 @@ document.observe("dom:loaded", function() {
       new Ajax.Request('/update_checkouts',{method:'get',
         onSuccess: function(response) {
           $('info_text').innerHTML = 'Please wait while Grist updates its search index.<br/>This is the last step!';
-          // $('initial_fetch').remove();
+          new Ajax.Request('/update_index',{method:'get',
+            onSuccess: function(response) {
+              $('info_text').innerHTML = 'All done. Thanks for waiting!';
+              spinner.stop();
+              // $('initial_fetch').remove();
+            }
+          });
         }
       });
     }
