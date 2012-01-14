@@ -54,13 +54,16 @@ class GistList
 
   YAML_PATH = 'gists.yml'
   attr_accessor :gists, :github_user
+  attr_reader :fetch_progress
 
   def initialize
     if File.exists?('gists.yml')
       puts "Loading from YAML"
       @gists = YAML.load_file('gists.yml')
+      @fetch_progress = 100
     else
       @gists = []
+      @fetch_progress = 0
     end
   end
 
@@ -104,7 +107,6 @@ class GistList
   end
 
   def fetch_all_gists
-    page = 1
     response = RestClient.get("https://api.github.com/gists", :params => { :access_token => github_user.token }, :accept => :json)
     gists = JSON.parse(response)
     pages = response.headers[:link].scan(/(\d+)>; rel="last"$/).first.first.to_i
@@ -112,6 +114,7 @@ class GistList
     GistList.instance.add_gists(gists.map{|gist_hash| Gist.new(gist_hash)})
     (2..pages).each do |page|
       fetch_gist_page(page)
+      @fetch_progress = ((page.to_f / pages.to_f) * 100).to_i
     end
   end
 end
@@ -128,9 +131,20 @@ end
 get '/' do
   authenticate!
   GistList.instance.github_user = github_user
-  GistList.instance.update
 
   haml :index
+end
+
+get '/update' do
+  authenticate!
+  GistList.instance.github_user = github_user
+
+  GistList.instance.update
+  "OK!"
+end
+
+get '/fetch_progress' do
+  GistList.instance.fetch_progress.to_s
 end
 
 get '/logout' do

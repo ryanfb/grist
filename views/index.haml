@@ -3,6 +3,10 @@
   %head
     %meta{'http-equiv' => 'content-type', 'content' => 'text/html;charset=UTF-8'}
     %link{:rel => "stylesheet", :href => "http://twitter.github.com/bootstrap/1.4.0/bootstrap.min.css"}
+    %link{:rel => "stylesheet", :href => "css/ui-progress-bar.css"}
+    %script{:src => "js/vendor/prototype.js", :type => "text/javascript"}
+    -#%script{:src => "js/vendor/scriptaculous.js", :type => "text/javascript"}
+    %script{:src => "js/grist.js", :type => "text/javascript"}
     %title Grist.
   %body{:style=>"padding-top: 40px;"}
     .topbar
@@ -12,25 +16,20 @@
             Grist
           .pull-right
             %form
-              %input.span6{:type => "text", :placeholder => "Search"}
+              %input.span6{:type => "text", :placeholder => "Search", :disabled => "disabled"}
             %ul.nav
               %li
                 %a{:href => "/logout"}
                   Sign out
     .row
       &nbsp;
-    %header
-      %center
-        .inner
-          .container
-            %h1
-              Hello, #{github_user.name}.
-              %small
-                You have #{gists.length} gists.
-    .container
-      %dl
-        - for gist in gists
-          %dt
-            #{gist.id}
-            - for file in gist.files
-              %dd= file
+    .container#initial_fetch{:style => "display:none;"}
+      .alert-message.block-message.info
+        .row
+          .span10.offset3
+            %center
+              %h3
+                Please wait while Grist fetches your Gist information from GitHub.
+              %img{:src => "images/ajax-loader-info.gif"}
+        %br
+    
