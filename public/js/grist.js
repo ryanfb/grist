@@ -1,4 +1,5 @@
 document.observe("dom:loaded", function() {
+  $('update_button').disable();
   var spinner = new Spinner({length:30,width:20,radius:40}).spin($('info_spinner'));
   new Ajax.Request('/fetch_progress',{method:'get',
     onSuccess: function(response) {
@@ -7,7 +8,7 @@ document.observe("dom:loaded", function() {
       }
     }
   });
-  new Ajax.Request('/update',{method:'get',
+  new Ajax.Request('/update_list',{method:'get',
     onSuccess: function(response) {
       $('info_text').innerHTML = 'Please wait while Grist updates its local checkouts.<br/>This may take a while.';
       new Ajax.Request('/update_checkouts',{method:'get',
@@ -17,6 +18,7 @@ document.observe("dom:loaded", function() {
             onSuccess: function(response) {
               $('info_text').innerHTML = 'All done. Thanks for waiting!';
               $('searchbox').enable();
+              $('update_button').enable();
               spinner.stop();
               // $('initial_fetch').remove();
             }

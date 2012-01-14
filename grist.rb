@@ -144,6 +144,13 @@ get '/update' do
   authenticate!
   GistList.instance.github_user = github_user
 
+  haml :update
+end
+
+get '/update_list' do
+  authenticate!
+  GistList.instance.github_user = github_user
+
   GistList.instance.update
   "OK!"
 end

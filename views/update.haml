@@ -1,0 +1,21 @@
+%script{:src => "js/grist.js", :type => "text/javascript"}
+.container#initial_fetch
+  -#{:style => "display:none;"}
+  .alert-message.block-message.info
+    .row
+      .span10.offset3
+        %center
+          %h3#info_text
+            Please wait while Grist fetches your Gist information from GitHub.
+            %br
+            &nbsp;
+          %br
+          %br
+          %br
+          %br
+          #info_spinner
+          %br
+          %br
+          %br
+          %br
+    %br
