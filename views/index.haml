@@ -23,13 +23,17 @@
                   Sign out
     .row
       &nbsp;
-    .container#initial_fetch{:style => "display:none;"}
+    .container#initial_fetch
+      -#{:style => "display:none;"}
       .alert-message.block-message.info
         .row
           .span10.offset3
             %center
-              %h3
+              %h3#info_text
                 Please wait while Grist fetches your Gist information from GitHub.
-              %img{:src => "images/ajax-loader-info.gif"}
+                %br
+                &nbsp;
+              %br
+              %img{:src => "images/ajax-loader-info.gif", :width => 128, :height => 128}
         %br
     

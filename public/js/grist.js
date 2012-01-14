@@ -8,7 +8,8 @@ document.observe("dom:loaded", function() {
   });
   new Ajax.Request('/update',{method:'get',
     onSuccess: function(response) {
-      $('initial_fetch').remove();
+      $('info_text').innerHTML = 'Please wait while Grist updates its local checkouts.<br/>This may take a while.';
+      // $('initial_fetch').remove();
     }
   });
 });
