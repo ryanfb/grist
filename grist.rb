@@ -99,6 +99,7 @@ class GistList
   end
   
   def update_checkouts
+    @size = nil
     @gists.each do |gist|
       gist.update
     end
@@ -124,7 +125,7 @@ class GistList
   end
 
   def size
-    `du -sh gists|awk '{print $1}'`.strip + "B"
+    @size ||= `du -sh gists|awk '{print $1}'`.strip + "B"
   end
 end
 
