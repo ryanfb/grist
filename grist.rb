@@ -6,6 +6,7 @@ require 'pp'
 require 'rest_client'
 require 'xapian-fu'
 require 'singleton'
+require 'padrino-helpers'
 
 enable :sessions, :logging
 
@@ -17,6 +18,7 @@ set :github_options, {
                      }
 
 Sinatra.register Sinatra::Auth::Github
+Sinatra.register Padrino::Helpers
 
 class Gist
   attr_reader :metadata, :id, :path
@@ -25,7 +27,6 @@ class Gist
     @metadata = gist_hash
     @id = @metadata["id"]
     @path = File.join('gists',"#{@id}")
-    # self.update
   end
 
   def update

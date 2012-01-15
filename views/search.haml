@@ -11,7 +11,12 @@
         - gist = GistList.instance.gist(result.values[:id])
         %a{:href => gist.metadata["html_url"]}
           = gist.id
-        %dd= result.values[:filename]
+        = " - "
+        %code= result.values[:filename]
+        .pull-right
+          = Time.parse(gist.metadata["created_at"]).strftime("%B %d, %Y")
+        - if gist.metadata["description"] && gist.metadata["description"].length > 0
+          %dd= gist.metadata["description"]
         %dd
           - split = result.values[:content].split("\n")
           - snippet = h split[0,10].join("\n")

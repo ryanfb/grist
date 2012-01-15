@@ -28,9 +28,16 @@
             %small
               You have #{gists.length} gists, using #{GistList.instance.size} on disk.
   .container
-    %dl
-      - for gist in gists
-        %dt
-          #{gist.id}
-          - for file in gist.files
-            %dd= file
+    - last_month = Time.parse((DateTime.now << 1).to_s)
+    .row
+      .span15.offset1
+        %h2 Last 30 gists:
+        - for gist in gists[0,30]
+          .row
+            .span3
+              %a{:href => gist.metadata["html_url"]}
+                = gist.id
+            - time = Time.parse(gist.metadata["created_at"])
+            - time_string = time < last_month ? time.strftime("%B %d, %Y") : (time_ago_in_words(time) + " ago")
+            .span3= time_string
+            .span8= gist.metadata["description"]
