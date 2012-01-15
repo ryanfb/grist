@@ -53,6 +53,8 @@ class GistList
   include Singleton
 
   YAML_PATH = 'gists.yml'
+  DB_PATH = 'gists.db'
+
   attr_accessor :gists, :github_user
   attr_reader :fetch_progress
 
@@ -84,7 +86,8 @@ class GistList
   end
   
   def build_xapian_db
-    @db = XapianFu::XapianDb.new(:dir => 'gists.db', :create => true,
+    FileUtils.rm_rf(DB_PATH)
+    @db = XapianFu::XapianDb.new(:dir => DB_PATH, :create => true,
                                 :store => [:id, :filename, :content])
     @gists.each do |gist|
       gist.files.each do |file|
@@ -96,7 +99,8 @@ class GistList
   end
 
   def search(query)
-    @db.search(query)
+    @db ||= XapianFu::XapianDb.new(:dir => DB_PATH, :create => false)
+    @db.search(query, :limit => @gists.length)
   end
   
   def update_checkouts
@@ -156,7 +160,6 @@ get '/update' do
 end
 
 get '/search' do
-  GistList.instance.build_xapian_db
   @results = GistList.instance.search(params[:query])
   @query = params[:query]
 
