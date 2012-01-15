@@ -20,7 +20,7 @@ document.observe("dom:loaded", function() {
               $('searchbox').enable();
               $('update_button').enable();
               spinner.stop();
-              // $('initial_fetch').remove();
+              window.location = "/";
             }
           });
         }
