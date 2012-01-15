@@ -13,3 +13,19 @@
                 Click the update button to get started.
               %h1
                 This process might take a while.
+- else
+  %header
+    %center
+      .inner
+        .container
+          %h1
+            Hello, #{github_user.name}.
+            %small
+              You have #{gists.length} gists, using #{GistList.instance.size} on disk.
+  .container
+    %dl
+      - for gist in gists
+        %dt
+          #{gist.id}
+          - for file in gist.files
+            %dd= file

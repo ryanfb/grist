@@ -122,6 +122,10 @@ class GistList
       @fetch_progress = ((page.to_f / pages.to_f) * 100).to_i
     end
   end
+
+  def size
+    `du -sh gists|awk '{print $1}'`.strip + "B"
+  end
 end
 
 helpers do
