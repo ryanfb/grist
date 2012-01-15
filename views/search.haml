@@ -1,9 +1,13 @@
 .container
+  %h1 #{@results.length} hits.
   %dl
     - for result in @results
       %dt
         #{result.values[:id]}
         %dd= result.values[:filename]
-        %dd= result.match
         %dd
-          %pre= h result.values[:content]
+          - split = result.values[:content].split("\n")
+          - snippet = h split[1..10].join("\n")
+          - if split.length > 10
+            - snippet += "\n<center>…</center>"
+          %pre= snippet
