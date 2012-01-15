@@ -1,0 +1,9 @@
+.container
+  %dl
+    - for result in @results
+      %dt
+        #{result.values[:id]}
+        %dd= result.values[:filename]
+        %dd= result.match
+        %dd
+          %pre= h result.values[:content]

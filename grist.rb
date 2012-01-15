@@ -84,18 +84,19 @@ class GistList
   end
   
   def build_xapian_db
-    db = XapianFu::XapianDb.new(:dir => 'gists.db', :create => true,
+    @db = XapianFu::XapianDb.new(:dir => 'gists.db', :create => true,
                                 :store => [:id, :filename, :content])
     @gists.each do |gist|
       gist.files.each do |file|
         contents = File.open(File.join(gist.path, file),"rb") {|f| f.read}
-        db << { :id => gist.id, :filename => file, :content => contents}
+        @db << { :id => gist.id, :filename => file, :content => contents}
       end
     end
-    db.flush
-    db.search("leiden").each do |match|
-      puts match.values[:id]
-    end
+    @db.flush
+  end
+
+  def search(query)
+    @db.search(query)
   end
   
   def update_checkouts
@@ -130,6 +131,8 @@ class GistList
 end
 
 helpers do
+  include Rack::Utils
+  alias_method :h, :escape_html
   def repos
     github_request("user/repos")
   end
@@ -150,6 +153,13 @@ get '/update' do
   GistList.instance.github_user = github_user
 
   haml :update
+end
+
+get '/search' do
+  GistList.instance.build_xapian_db
+  @results = GistList.instance.search(params[:query])
+
+  haml :search
 end
 
 get '/update_list' do

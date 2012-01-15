@@ -19,8 +19,8 @@
             %button.btn.primary#update_button
               Update
           .pull-right
-            %form
-              %input.span6#searchbox{:type => "text", :placeholder => "Search", :disabled => "disabled"}
+            %form{:action => "search"}
+              %input.span6#searchbox{:name => "query", :type => "text", :placeholder => "Search", :disabled => "disabled"}
             %ul.nav
               %li
                 %a{:href => "/logout"}
