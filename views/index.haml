@@ -14,6 +14,11 @@
               %h1
                 This process might take a while.
 - else
+  :javascript
+    document.observe("dom:loaded", function() {
+      $('searchbox').enable();
+    });
+
   %header
     %center
       .inner
