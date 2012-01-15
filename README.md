@@ -3,6 +3,8 @@ Grist
 
 Grist is a single-serving web app for searching only your own Gists.
 
+![Screenshot](http://dl.dropbox.com/u/360471/Screenshots/8yb60buczv91.png)
+
 Usage
 -----
 
