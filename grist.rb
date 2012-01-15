@@ -71,9 +71,8 @@ class GistList
   end
 
   def update
-    if @gists.length == 0
-      fetch_all_gists
-    end
+    @gists = []
+    fetch_all_gists
   end
 
   def add_gists(gists)
