@@ -158,6 +158,7 @@ end
 get '/search' do
   GistList.instance.build_xapian_db
   @results = GistList.instance.search(params[:query])
+  @query = params[:query]
 
   haml :search
 end

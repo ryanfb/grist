@@ -1,3 +1,8 @@
+:javascript
+  document.observe("dom:loaded", function() {
+    $('searchbox').setValue('#{@query}');
+    $('searchbox').enable();
+  });
 .container
   %h1 #{@results.length} hits.
   %dl
