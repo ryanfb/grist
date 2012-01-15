@@ -98,6 +98,10 @@ class GistList
     @db.flush
   end
 
+  def gist(id)
+    @gists.find {|gist| gist.id == id}
+  end
+
   def search(query)
     @db ||= XapianFu::XapianDb.new(:dir => DB_PATH, :create => false)
     @db.search(query, :limit => @gists.length)

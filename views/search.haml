@@ -8,11 +8,13 @@
   %dl
     - for result in @results
       %dt
-        #{result.values[:id]}
+        - gist = GistList.instance.gist(result.values[:id])
+        %a{:href => gist.metadata["html_url"]}
+          = gist.id
         %dd= result.values[:filename]
         %dd
           - split = result.values[:content].split("\n")
-          - snippet = h split[1..10].join("\n")
+          - snippet = h split[0,10].join("\n")
           - if split.length > 10
             - snippet += "\n<center>…</center>"
           %pre= snippet
